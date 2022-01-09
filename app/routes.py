@@ -1,10 +1,18 @@
-from flask import request
+from flask import request, render_template
 from datetime import datetime
 
 from app import app, db
 from app.database import User
 
 VERSION = "1.0.0"
+
+@app.get("/")
+def get_home():
+    return render_template("home.html")
+
+@app.get("/about")
+def get_about():
+    return render_template("about.html")
 
 @app.get("/version")
 def get_version():
@@ -40,19 +48,14 @@ def get_all_users():
         temp["hobbies"] = user.hobbies
         temp["active"] = user.active
         out_list.append(temp)
-    return {"users": out_list}
+    return render_template("list_users.html", users=out_list)
 
 @app.get("/users/<int:pk>")
 def get_single_user(pk):
     user = User.query.filter_by(id=pk).first()
+    return render_template("user_detail.html", user=user)
 
-    return {
-        "first_name": user.first_name, 
-        "last_name": user.last_name,
-        "hobbies": user.hobbies,
-        "active": user.active
-    }
-
+    
 @app.put("/users/<int:pk>")
 def update_user(pk):
     user_data = request.json
